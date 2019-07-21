@@ -5,7 +5,13 @@ metadata:
   labels:
     app: laravel-swoole
 spec:
-  replicas: 1
+  replicas: 3
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: laravel-swoole
@@ -17,8 +23,33 @@ spec:
         tier: web
     spec:
       containers:
-      - name: laravel-swoole
-        image: kurorido/laravel-swoole
-        ports:
-        - containerPort: 1215
-          protocol: TCP
+        # Laravel
+        - name: laravel-swoole
+          image: kurorido/laravel-swoole
+          resources:
+          ports:
+            - containerPort: 1215
+              protocol: TCP
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudsql-db-credentials
+                  key: password
+        # Cloud SQL
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.14
+          command: ["/cloud_sql_proxy",
+                      "-instances=your-instance-name=tcp:3306",
+                      "-credential_file=/secrets/cloudsql/credentials.json"]
+          securityContext:
+            runAsUser: 2
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials

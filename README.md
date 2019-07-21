@@ -6,6 +6,10 @@
 
 now you can access http://localhost:1215
 
+# Prepare Cloud SQL
+
+modify `your-instance-name` in `kubernetes/deployment.yaml`
+
 # Deploy to Kubernetes
 
 `kubectl apply -f kubernetes/deployment.yaml`
@@ -29,3 +33,13 @@ now you can access http://localhost:1215
 `gcloud compute addresses delete laravel-swoole-ip`
 
 `kubectl delete -f kubernetes/deployment.yaml`
+
+# Connect to Pods
+
+kubectl get pods -l app=laravel-swoole
+
+kubectl exec -it laravel-swoole-deployment-85b8cddf8f-7pv9k -- /bin/sh
+
+# References
+
+
