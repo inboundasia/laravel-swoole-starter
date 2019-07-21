@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: laravel-swoole-service
+  labels:
+    app: laravel-swoole
+spec:
+  selector:
+    app: laravel-swoole
+    tier: web
+  ports:
+  - port: 80
+    targetPort: 1215
+  type: LoadBalancer

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-swoole-deployment
+  labels:
+    app: laravel-swoole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: laravel-swoole
+      tier: web
+  template:
+    metadata:
+      labels:
+        app: laravel-swoole
+        tier: web
+    spec:
+      containers:
+      - name: laravel-swoole
+        image: kurorido/laravel-swoole
+        ports:
+        - containerPort: 1215
+          protocol: TCP
